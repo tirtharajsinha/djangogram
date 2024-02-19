@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    container_name: db
+    restart: always
+    ports:
+      - 5432:5432   
+    environment:
+      - POSTGRES_USER=cool_user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=cool_db
+    volumes:
+      - ./pData:/var/lib/postgresql/data
+    healthcheck:      
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -t 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+
+
+  web:
+    build: .
+    volumes:
+      - ./chat/migrations:/app/chat/migrations
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis  
+    links: 
+        - db
+        - redis
+
+    develop:
+      watch:
+        # it'll watch for changes in package.json and package-lock.json and rebuild the container if there are any changes
+        - path: ./requirements.txt
+          action: rebuild
+        - path: ./chat
+          target: /app/chat
+          action: sync
+        - path: ./core
+          target: /app/core
+          action: sync
+
+

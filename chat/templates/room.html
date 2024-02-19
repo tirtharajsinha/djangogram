@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load chattags %}
+{% block title %}{{room.name}} |{% endblock %}
+
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/room.css">
+{% endblock %}
+{% block content %}
+<div class="chatwindow">
+    <div class="chathead">
+        <div class="roomdetails">
+            <div class="roomimage">
+                <div>{{room|room_to_private:user|slice:"0:1"}}</div>
+            </div>
+            <div class="otherroomdetails">
+                <div class="roomname">{{room|room_to_private:user}}</div>
+                <div class="roomonlinecount"></div>
+            </div>
+
+        </div>
+    </div>
+    <div class="form-control" id="chatLog" readonly>
+        {% for msg in room_messages %}
+        <div class="chat {% if user.username == msg.user.username %} mychat {% endif %}">
+            <div class="msgdata">
+                <span>{{msg.user.username}}</span>
+                {{msg.content}}
+            </div>
+            <div class="othermsgdata">
+                <div>{{msg.timestamp|date:'d:i j M, y' }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chatMessageInputBox">
+        <i class="fas fa-paperclip"></i>
+        <input type="text" class="form-control" id="chatMessageInput" placeholder="Write your message...">
+        <button id="chatMessageSend" type="button"><i class="fas fa-paper-plane-top"></i></button>
+    </div>
+</div>
+{{ room.name|json_script:"roomName" }}
+{{ room.type|json_script:"roomType" }}
+{{ user.username|json_script:"userName" }}
+</div>
+<script src="/static/js/room.js"></script>
+
+
+{% endblock %}

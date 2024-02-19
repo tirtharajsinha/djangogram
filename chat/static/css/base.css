@@ -1,0 +1,243 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic,900,900italic);
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* font-size: 16px; */
+  font-family: "Roboto", sans-serif;
+}
+
+:root {
+  --bg-primary: #eceff4;
+  --bg-secondary: #d8dee9;
+  --color-primary: #2e3440;
+  --color-secondary: #434c5e;
+  --color-burned: #434c5e3b;
+
+  --accent-color: #4a77fb;
+
+  --danger-color: #bf616a;
+  --warning-color: #d08770;
+  --yellow-color: #ebcb8b;
+  --success-color: #a3be8c;
+}
+
+.darktheme {
+  --bg-primary: #23211e;
+  --bg-secondary: #3b3936;
+
+  --color-primary: #eceff4;
+  --color-secondary: #d8dee9;
+  --color-burned: #d8dee95f;
+
+  --accent-color: #4f7bff;
+}
+
+#main {
+  background-color: var(--bg-primary);
+  color: var(--color-primary);
+  margin-left: 350px;
+  height: 100vh;
+}
+
+#sidebar {
+  background-color: var(--bg-secondary);
+  color: var(--color-primary);
+  width: 350px;
+  float: left;
+  height: 100vh;
+}
+
+#split-bar {
+  background-color: transparent;
+  height: 100%;
+  float: right;
+  width: 6px;
+  cursor: col-resize;
+}
+
+.sidebar {
+  width: calc(100% - 7px);
+  height: 100%;
+  float: left;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.sidebar .usercard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  padding: 10px;
+}
+
+.sidebar .usercard .profileimage {
+  flex-basis: 50px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+}
+.sidebar .usercard .profileimage div {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--color-primary);
+  text-transform: capitalize;
+}
+
+.sidebar .usercard .profileinfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sidebar .usercard .profileinfoname {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--accent-color);
+}
+
+.sidebar .usercard .profileinfoemail {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.themetoggle {
+  position: absolute;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 20px;
+  border: 2px solid var(--color-burned);
+  margin-top: 20px;
+  padding: 5px 10px;
+}
+
+.searchbar input {
+  flex-grow: 1;
+  outline: none;
+  font-size: 18px;
+  border: none;
+  background: transparent;
+  padding-left: 10px;
+  color: var(--color-primary);
+}
+
+.searchbar input:focus {
+  outline: none;
+  border: none;
+}
+
+.searchbar button {
+  outline: none;
+  border: none;
+  flex-basis: 20px;
+  width: 20px;
+  display: none;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.contactlist {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.contactlist .contactcard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.contactlist .active {
+  background-color: var(--accent-color);
+}
+
+.contactlist .contactcard .contactimage {
+  flex-basis: 50px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--yellow-color);
+  padding: 20px;
+}
+.contactlist .contactcard .contactimage div {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--color-primary);
+  text-transform: capitalize;
+}
+
+.contactlist .contactcard .contactinfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contactlist .contactcard .contactinfoname {
+  font-size: 18px;
+  font-weight: 500;
+  color: white;
+}
+
+.contactlist .contactcard:not(.active) .contactinfoname {
+  color: var(--accent-color);
+}
+
+/* .contactlist .contactcard .contactinfoname {
+  color: white;
+} */
+
+.contactlist .contactcard .contactlastmsg {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(188, 188, 188);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.contactlist .contactcard:not(.active) .contactlastmsg {
+  color: var(--color-secondary);
+}
+
+.contactlist .contactcard:hover:not(.active) {
+  background-color: var(--bg-primary);
+}
