@@ -10,6 +10,7 @@ $('#split-bar').mousedown(function (e) {
         if (x > min && x < max && e.pageX < ($(window).width() - mainmin)) {
             $('#sidebar').css("width", x);
             $('#main').css("margin-left", x);
+            document.querySelector(':root').style.setProperty("--sidebar-width", x);
         }
     })
 });

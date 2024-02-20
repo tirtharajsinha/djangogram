@@ -22,6 +22,7 @@
   --warning-color: #d08770;
   --yellow-color: #ebcb8b;
   --success-color: #a3be8c;
+  --sidebar-width: 350;
 }
 
 .darktheme {
@@ -33,6 +34,34 @@
   --color-burned: #d8dee95f;
 
   --accent-color: #4f7bff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+.success {
+  color: var(--success-color) !important;
+}
+
+.danger {
+  color: var(--danger-color) !important;
 }
 
 #main {
@@ -111,7 +140,7 @@
   color: var(--color-secondary);
 }
 
-.themetoggle {
+.menutoggle {
   position: absolute;
   right: 10px;
   width: 50px;
@@ -240,4 +269,118 @@
 
 .contactlist .contactcard:hover:not(.active) {
   background-color: var(--bg-primary);
+}
+
+.menubar {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 200px;
+  transform: translateX(-300px);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--bg-secondary);
+  color: var(--color-primary);
+  transition: transform 0.3s ease-in-out;
+}
+
+.menubar-open {
+  width: calc(var(--sidebar-width) * 1px - 5px);
+  transform: translateX(0);
+}
+
+.menubar .menuitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  word-break: keep-all;
+  color: var(--color-primary);
+  padding-left: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.menubar .menuitem i {
+  width: 24px;
+}
+
+.room_creator {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-burned);
+  backdrop-filter: blur(10px);
+}
+
+.open-group-creator {
+  display: flex;
+}
+
+.room_creator .creator {
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 20px;
+  transform: translateX(100px);
+  opacity: 0;
+  animation: slidebox 0.3s forwards ease-in-out;
+}
+
+@keyframes slidebox {
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.room_creator .creator h3 {
+  color: var(--accent-color);
+}
+
+.room_creator .creator input {
+  background-color: transparent;
+  font-size: 18px;
+  color: var(--color-secondary);
+  border: none;
+  outline: none;
+  border-bottom: 2px solid var(--color-secondary);
+  width: 300px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.room_creator .creator input:focus {
+  border: none;
+  outline: none;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.room_creator .creator .creator-error {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.room_creator .creator .creator-btnbox {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.room_creator .creator .creator-btnbox button {
+  color: var(--accent-color);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  cursor: pointer;
+  font-weight: 600;
 }

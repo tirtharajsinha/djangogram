@@ -81,27 +81,6 @@
   border-radius: 10px;
 }
 
-/* width */
-#chatLog::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* Track */
-#chatLog::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-#chatLog::-webkit-scrollbar-thumb {
-  background: var(--accent-color);
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-#chatLog::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-color);
-}
-
 #onlineUsersSelector {
   height: 300px;
 }
