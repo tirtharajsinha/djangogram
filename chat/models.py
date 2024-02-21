@@ -69,3 +69,9 @@ class Message(models.Model):
 class LetestMessage(models.Model):
     room = models.ForeignKey(to=Room, on_delete=models.CASCADE)
     message = models.ForeignKey(to=Message, on_delete=models.CASCADE)
+
+
+class JoinedRoom(models.Model):
+    room = models.ForeignKey(to=Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    joined = models.DateTimeField(auto_now_add=True)

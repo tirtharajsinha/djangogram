@@ -1,22 +1,24 @@
 import json
-from django.forms import ValidationError
+from django.forms import ValidationError, model_to_dict
 from django.shortcuts import render, redirect
-from chat.models import Room, Message
+from chat.models import Room, Message, JoinedRoom
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
 
 
 @login_required
 def chat_index(request):
     user = request.user
+    joined_rooms = JoinedRoom.objects.filter(user=user).values_list("room")
     rooms = Room.objects.filter(
-        Q(type="group") | (Q(firstUser=user) | Q(secondUser=user))
-    )
+        Q(id__in=joined_rooms) | Q(firstUser=user) | Q(secondUser=user) | Q(admin=user)
+    ).order_by("-id")
+
+    # print(list(joined_rooms), list(rooms), flush=True)
     return render(
         request,
         "index.html",
@@ -52,6 +54,7 @@ def create_room(request):
                 return JsonResponse({"error": "room already exists"})
             else:
                 newroom = Room.objects.create(name=room_name, admin=request.user)
+                joinroom = JoinedRoom.objects.create(room=newroom, user=request.user)
                 return JsonResponse(
                     {
                         "success": "room created successfully",
@@ -74,9 +77,18 @@ def room_view(request, room_uuid):
         return redirect("/chat")
 
     user = request.user
+    if chat_room.type == "private":
+        if chat_room.firstUser.id != user.id and chat_room.secondUser.id != user.id:
+            return redirect("/chat")
+
+    if chat_room.type == "group":
+        joinroom = JoinedRoom.objects.get_or_create(room=chat_room, user=request.user)
+
     room_messages = Message.objects.filter(room=chat_room)
+
+    joined_rooms = JoinedRoom.objects.filter(user=user).values_list("room")
     rooms = Room.objects.filter(
-        Q(type="group") | (Q(firstUser=user) | Q(secondUser=user))
+        Q(id__in=joined_rooms) | Q(firstUser=user) | Q(secondUser=user) | Q(admin=user)
     ).order_by("-id")
 
     print(rooms)
@@ -112,9 +124,13 @@ def create_private_chat_room(request, privateuser):
 
 
 @login_required
-def get_search_data(request):
+def get_search_data(request, query):
     rooms = Room.objects.values("unique_id", "name", "type", "admin").filter(
-        type="group"
+        Q(type="group") & Q(name__icontains=query)
     )
-    users = User.objects.values("username").filter(~Q(request.user.username))
+
+    users = User.objects.filter(
+        ~Q(username=request.user.username) & Q(username__icontains=query)
+    ).values("username")
+    print(list(users), flush=True)
     return JsonResponse({"rooms": list(rooms), "users": list(users)})

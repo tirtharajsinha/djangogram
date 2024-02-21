@@ -1,4 +1,6 @@
 from django import template
+from django.core.serializers import serialize
+import json
 
 register = template.Library()
 
@@ -18,3 +20,8 @@ def room_to_private(room, user):
         return roomname
     except:
         raise Exception(f"{roomname} {roomtype} {currentuser}")
+
+
+@register.filter
+def querysetToJson(queryset):
+    return list(queryset.values())

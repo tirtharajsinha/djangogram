@@ -44,14 +44,12 @@
                     <i class="fas fa-xmark"></i>
                 </button>
             </div>
-            <div class="contactlist">
-                {% for lroom in rooms %}
-                {% if room and room.name == lroom.name %}
-                <div class="contactcard active" data-room="{{lroom|room_to_private:user}}">
-                    {% else %}
-                    <div class="contactcard" data-room="{{lroom|room_to_private:user}}"
-                        onclick='openchat("{{lroom.unique_id}}")'>
-                        {% endif %}
+            <div class="listbar">
+                <!-- Display your contacts and groups -->
+                <div class="contactlist">
+                    {% for lroom in rooms %}
+                    {% if room and room.name == lroom.name %}
+                    <div class="contactcard active" data-room="{{lroom|room_to_private:user}}">
                         <div class="contactimage">
                             <div>{{lroom|room_to_private:user|slice:"0:1"}}</div>
                         </div>
@@ -60,155 +58,316 @@
                             <p class="contactlastmsg">This is a {{lroom.type}} chat</p>
                         </div>
                     </div>
+                    {% else %}
+                    <div class="contactcard" data-room="{{lroom|room_to_private:user}}"
+                        onclick='openchat("{{lroom.unique_id}}")'>
+
+                        <div class="contactimage">
+                            <div>{{lroom|room_to_private:user|slice:"0:1"}}</div>
+                        </div>
+                        <div class="contactinfo">
+                            <p class="contactinfoname">{{lroom|room_to_private:user}}</p>
+                            <p class="contactlastmsg">This is a {{lroom.type}} chat</p>
+                        </div>
+                    </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
-            </div>
-        </div>
-        <div class="menubar">
-            <div class="menuitem group-creator-toggle">
-                <i class="fad fa-people-group"></i>
-                <span>Create Group</span>
-            </div>
-            <div class="menuitem">
-                <i class="fad fa-gear"></i>
-                <span>Settings</span>
-            </div>
-            <div class="menuitem">
-                <i class="fa-duotone fa-user"></i>
-                <span>Contacts</span>
-            </div>
-            <div class="menuitem themetoggle">
-                <i class="fad fa-moon-stars"></i>
-                <span>Change Theme</span>
-            </div>
-            <div class="menuitem danger">
-                <i class="fa-duotone fa-user"></i>
-                <span>Logout</span>
-            </div>
-        </div>
 
 
-        <div class="room_creator">
-            <div class="creator">
-                <h3>New Group</h3>
-                <input type="text" placeholder="Group name" id="creator-input">
-                <p class="creator-error danger"></p>
-                <div class="creator-btnbox">
-                    <button class="close-room-creator">Cancel</button>
-                    <button class="create-room-btn">
-                        <i class="fad fa-spinner-third fa-spin" style="display: none; margin-left: 10px;"></i>
-                        <span>Next</span>
-                    </button>
+                <!-- displays search results -->
+                <div class="searchresultlist close-searchresultlist">
+                    <div class="localsearchresultlist"></div>
+                    <div class="globalsearchresultlist"></div>
                 </div>
             </div>
+
+
         </div>
-        <div id="main">
-            {% block content %}
-            {% endblock %}
+    </div>
+
+    </div>
+    <div class="menubar">
+        <div class="menuitem group-creator-toggle">
+            <i class="fad fa-people-group"></i>
+            <span>Create Group</span>
         </div>
-        <!-- partial -->
-        <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-        <script src="/static/js/resizer.js"></script>
-        <script src="/static/js/moment.min.js"></script>
-        <script>
-            var CSRF_TOKEN = '{{ csrf_token }}';
-            document.querySelector(".themetoggle").addEventListener("click", (e) => {
-                console.log("changing theme");
-                document.querySelector("body").classList.toggle("darktheme")
-            })
+        <div class="menuitem">
+            <i class="fad fa-gear"></i>
+            <span>Settings</span>
+        </div>
+        <div class="menuitem">
+            <i class="fa-duotone fa-user"></i>
+            <span>Contacts</span>
+        </div>
+        <div class="menuitem themetoggle">
+            <i class="fad fa-moon-stars"></i>
+            <span>Change Theme</span>
+        </div>
+        <div class="menuitem danger">
+            <i class="fa-duotone fa-user"></i>
+            <span>Logout</span>
+        </div>
+    </div>
 
-            document.querySelector(".menutoggle").addEventListener("click", (e) => {
-                toggleMenu();
-            })
 
-            document.querySelector(".create-room-btn").addEventListener("click", (e) => {
-                create_group();
-            })
+    <div class="room_creator">
+        <div class="creator">
+            <h3>New Group</h3>
+            <input type="text" placeholder="Group name" id="creator-input">
+            <p class="creator-error danger"></p>
+            <div class="creator-btnbox">
+                <button class="close-room-creator">Cancel</button>
+                <button class="create-room-btn">
+                    <i class="fad fa-spinner-third fa-spin" style="display: none; margin-left: 10px;"></i>
+                    <span>Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="main">
+        {% block content %}
+        {% endblock %}
+    </div>
 
-            document.querySelector(".group-creator-toggle").addEventListener("click", (e) => {
+
+    <!-- Value from django at page load -->
+    {{ rooms|querysetToJson|json_script:"roomsList" }}
+    {{ user.username|json_script:"curUserName" }}
+
+    <!-- partial -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src="/static/js/resizer.js"></script>
+    <script src="/static/js/moment.min.js"></script>
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token }}';
+        const roomsList = JSON.parse(document.getElementById('roomsList').textContent);
+        const curUserName = JSON.parse(document.getElementById('curUserName').textContent);
+        let curLocalSearchResults = [];
+
+
+        document.querySelector(".themetoggle").addEventListener("click", (e) => {
+            console.log("changing theme");
+            document.querySelector("body").classList.toggle("darktheme")
+        })
+
+        document.querySelector(".menutoggle").addEventListener("click", (e) => {
+            toggleMenu();
+        })
+
+        document.querySelector(".create-room-btn").addEventListener("click", (e) => {
+            create_group();
+        })
+
+        document.querySelector(".group-creator-toggle").addEventListener("click", (e) => {
+            toggle_group_creator();
+            toggleMenu();
+        })
+
+        document.querySelector(".close-room-creator").addEventListener("click", (e) => {
+            toggle_group_creator();
+        })
+
+        document.getElementById("searchbar").addEventListener("input", (e) => {
+            document.querySelector(".localsearchresultlist").innerHTML = "";
+            document.querySelector(".globalsearchresultlist").innerHTML = "";
+            if (e.target.value != "") {
+                document.querySelector(".contactlist").classList.add("close-contactlist");
+                document.querySelector(".searchresultlist").classList.remove("close-searchresultlist");
+                handle_local_search(e.target.value);
+                handle_global_search(e.target.value);
+            }
+            else {
+                document.querySelector(".contactlist").classList.remove("close-contactlist");
+                document.querySelector(".searchresultlist").classList.add("close-searchresultlist");
+            }
+
+        })
+
+
+        function handle_local_search(searchvalue) {
+            // console.log(searchvalue);
+            let filtered_list = roomsList.map(a => { return { ...a } })
+            filtered_list = filtered_list.filter((room) => room.name.search(searchvalue) >= 0);
+            renderLocalSearchCards(filtered_list, "Showing From your contact");
+        }
+
+
+        async function handle_global_search(searchvalue) {
+            let searchresult = await callSearchApi(searchvalue);
+            await renderGlobalSearchCards(searchvalue, searchresult["rooms"], searchresult["users"], "Showing Global search results")
+        }
+
+        async function callSearchApi(query) {
+            let rawSearchResponse = await fetch(`/chat/getchatsearch/${query}`)
+            return await rawSearchResponse.json();
+        }
+
+
+        function renderLocalSearchCards(filtered_list, resultHead) {
+            let searchlistelement = document.querySelector(".localsearchresultlist")
+            curLocalSearchResults = [];
+            searchlistelement.innerHTML = `<div class="searchresultpartition">${resultHead}</div>`;
+            if (filtered_list.length == 0) {
+                searchlistelement.innerHTML += "<p>No search result matched.</p>"
+            }
+            filtered_list.forEach(room => {
+                if (room.type == "private") {
+                    let roomnamesplited = room.name.split("__");
+                    let index = roomnamesplited.indexOf(curUserName);
+                    roomnamesplited.splice(index, 1);
+                    room.name = roomnamesplited[0];
+                }
+                curLocalSearchResults.push(room.name);
+                searchlistelement.innerHTML += `
+                <div class="searchresultcard" data-room="${room.name}" onclick='openchat("${room.unique_id}","${room.name}")'>
+                        <div class="searchresultimage">
+                            <div>${room.name[0]}</div>
+                        </div>
+                        <div class="searchresultinfo">
+                            <p class="searchresultinfoname">${room.name}</p>
+                            <p class="searchresultinfolastmsg">This is a ${room.type} chat</p>
+                        </div>
+                    </div>
+                `
+            });
+        }
+
+
+        function renderGlobalSearchCards(query, filtered_list, user_list, resultHead) {
+            let searchlistelement = document.querySelector(".globalsearchresultlist")
+            if (document.getElementById("searchbar").value != query) {
+                return;
+            }
+            let releventCount = 0;
+            searchlistelement.innerHTML = `<div class="searchresultpartition">${resultHead}</div>`;
+
+            filtered_list.forEach(room => {
+                if (!curLocalSearchResults.includes(room.name)) {
+                    releventCount++;
+                    searchlistelement.innerHTML += `
+                <div class="searchresultcard" data-room="${room.name}" onclick='openchat("${room.unique_id}","${room.name}")'>
+                        <div class="searchresultimage">
+                            <div>${room.name[0]}</div>
+                        </div>
+                        <div class="searchresultinfo">
+                            <p class="searchresultinfoname">${room.name}</p>
+                            <p class="searchresultinfolastmsg">This is a ${room.type} chat</p>
+                        </div>
+                    </div>
+                `
+                }
+
+            });
+
+
+            user_list.forEach(user => {
+                if (!curLocalSearchResults.includes(user.username)) {
+                    releventCount++;
+                    searchlistelement.innerHTML += `
+                <div class="searchresultcard" data-room="${user.username}" onclick='openprivatechat("${user.username}")'>
+                        <div class="searchresultimage">
+                            <div>${user.username[0]}</div>
+                        </div>
+                        <div class="searchresultinfo">
+                            <p class="searchresultinfoname">${user.username}</p>
+                            <p class="searchresultinfolastmsg">This is a private chat</p>
+                        </div>
+                    </div>
+                `
+                }
+
+            });
+
+
+            if (releventCount == 0) {
+                searchlistelement.innerHTML += "<p>No search result matched.</p>"
+            }
+        }
+
+
+
+
+        function toggle_group_creator() {
+            document.querySelector(".room_creator input").value = "";
+            document.querySelector(".creator-error").innerHTML = ""
+            document.querySelector(".room_creator").classList.toggle("open-group-creator");
+        }
+
+
+        function toggleMenu() {
+            document.querySelector(".menubar").classList.toggle("menubar-open");
+            document.querySelector(".menutoggle i").classList.toggle("fa-bars-staggered");
+            document.querySelector(".menutoggle i").classList.toggle("fa-xmark");
+        }
+
+
+        async function create_group() {
+            let newgroupname = document.getElementById("creator-input").value;
+            if (newgroupname == "") {
+                document.querySelector(".creator-error").innerHTML = "Group name can't be empty."
+            }
+            document.querySelector(".create-room-btn i").style.display = "inline";
+            let res = await request_create_group(newgroupname);
+
+            if (res.error) {
+                document.querySelector(".create-room-btn i").style.display = "none";
+                document.querySelector(".creator-error").innerHTML = res.error;
+                console.log(res);
+            }
+            else if (res.success) {
+                document.querySelector(".create-room-btn i").style.display = "none";
+                document.querySelector(".creator-error").innerHTML = "";
+                console.log("room created successfully");
                 toggle_group_creator();
-                toggleMenu();
-            })
-
-            document.querySelector(".close-room-creator").addEventListener("click", (e) => {
-                toggle_group_creator();
-            })
-
-            function toggle_group_creator() {
-                document.querySelector(".room_creator input").value = "";
-                document.querySelector(".creator-error").innerHTML = ""
-                document.querySelector(".room_creator").classList.toggle("open-group-creator");
+                openchat(res.newroom_unique_id);
             }
-
-
-            function toggleMenu() {
-                document.querySelector(".menubar").classList.toggle("menubar-open");
-                document.querySelector(".menutoggle i").classList.toggle("fa-bars-staggered");
-                document.querySelector(".menutoggle i").classList.toggle("fa-xmark");
+            else {
+                document.querySelector(".create-room-btn i").style.display = "none";
             }
+        }
 
 
-            async function create_group() {
-                let newgroupname = document.getElementById("creator-input").value;
-                if (newgroupname == "") {
-                    document.querySelector(".creator-error").innerHTML = "Group name can't be empty."
-                }
-                document.querySelector(".create-room-btn i").style.display = "inline";
-                let res = await request_create_group(newgroupname);
+        async function request_create_group(groupname) {
+            const rawResponse = await fetch('/chat/newroom', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                mode: 'same-origin',
+                body: JSON.stringify({
+                    room_name: groupname
+                })
+            });
+            return await rawResponse.json();
+        }
 
-                if (res.error) {
-                    document.querySelector(".create-room-btn i").style.display = "none";
-                    document.querySelector(".creator-error").innerHTML = res.error;
-                    console.log(res);
-                }
-                else if (res.success) {
-                    document.querySelector(".create-room-btn i").style.display = "none";
-                    document.querySelector(".creator-error").innerHTML = "";
-                    console.log("room created successfully");
-                    toggle_group_creator();
-                    openchat(res.newroom_unique_id);
-                }
-                else {
-                    document.querySelector(".create-room-btn i").style.display = "none";
-                }
+
+
+
+
+        document.getElementById("searchbar").addEventListener("input", (e) => {
+            if (e.target.value != "") {
+                document.querySelector(".searchbar button").style.display = "block";
             }
-
-
-            async function request_create_group(groupname) {
-                const rawResponse = await fetch('/chat/newroom', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': CSRF_TOKEN
-                    },
-                    mode: 'same-origin',
-                    body: JSON.stringify({
-                        room_name: groupname
-                    })
-                });
-                return await rawResponse.json();
+            else {
+                document.querySelector(".searchbar button").style.display = "none";
             }
+        })
 
 
+        function openchat(unique_id, group = "") {
+            console.log(`Redirection to(${group}) : /chat/${unique_id}`);
+            window.location.replace(`/chat/${unique_id}`);
+        }
 
-
-
-            document.getElementById("searchbar").addEventListener("input", (e) => {
-                if (e.target.value != "") {
-                    document.querySelector(".searchbar button").style.display = "block";
-                }
-                else {
-                    document.querySelector(".searchbar button").style.display = "none";
-                }
-            })
-
-
-            function openchat(unique_id) {
-                console.log(`Redirection to : /chat/${unique_id}`);
-                window.location.replace(`/chat/${unique_id}`);
-            }
-        </script>
+        function openprivatechat(reqUser) {
+            console.log(`Redirection to : /chat/privatechat/${reqUser}`);
+            window.location.replace(`/chat/privatechat/${reqUser}`);
+        }
+    </script>
 </body>
 
 </html>

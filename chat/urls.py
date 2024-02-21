@@ -11,5 +11,5 @@ urlpatterns = [
         views.create_private_chat_room,
         name="chat-create-private",
     ),
-    path("getchatsearch", views.get_search_data, name="chat-search"),
+    path("getchatsearch/<str:query>", views.get_search_data, name="chat-search"),
 ]
