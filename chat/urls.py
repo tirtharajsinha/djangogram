@@ -12,4 +12,5 @@ urlpatterns = [
         name="chat-create-private",
     ),
     path("getchatsearch/<str:query>", views.get_search_data, name="chat-search"),
+    path("inviteuser", views.invite_user_to_group, name="user-invite"),
 ]

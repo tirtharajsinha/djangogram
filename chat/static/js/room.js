@@ -74,6 +74,34 @@ chatMessageSend.onclick = function () {
     chatMessageInput.value = "";
 };
 
+function internalMsgSender(msg) {
+    if (msg.length === 0) return;
+    chatSocket.send(JSON.stringify({
+        "message": msg,
+    }));
+}
+
+
+function filterMsg(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    text = text.replace(urlRegex, function (url) {
+        return `<a href="${url}">${url}</a>`;
+    })
+
+    var tagRegex = /(@[^\s]+)/g;
+    text = text.replace(tagRegex, function (tag) {
+        let val = tag.slice(1);
+        return `<a href='/chat/privatechat/${val}' class='tagtype'>${tag}</a>`;
+    })
+
+    return text;
+
+}
+
+
+
+
+
 let chatSocket = null;
 
 function connect() {
@@ -107,10 +135,11 @@ function connect() {
 
                 let curtime = moment().format('HH:MM D MMM, YY');
 
+                let filteredMsg = filterMsg(data.message);
                 newchat.innerHTML = `
                 <div class="msgdata">
                     <span>${data.user}</span>
-                    ${data.message}
+                    <p>${filteredMsg}</p>
                 </div>
                 <div class="othermsgdata">
                     <div>${curtime}</div>

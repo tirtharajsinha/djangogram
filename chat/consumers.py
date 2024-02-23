@@ -129,9 +129,9 @@ class ChatConsumer(WebsocketConsumer):
             user=self.user, room=self.room, content=message
         )
 
-        # LetestMessage.objects.update_or_create(
-        #     room=self.room, defaults={"message": message}
-        # )
+        LetestMessage.objects.update_or_create(
+            room=self.room, defaults={"message": message}
+        )
 
     def chat_message(self, event):
         self.send(text_data=json.dumps(event))

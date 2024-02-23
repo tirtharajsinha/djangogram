@@ -17,7 +17,16 @@
                 <div class="roomname">{{room|room_to_private:user}}</div>
                 <div class="roomonlinecount"></div>
             </div>
-
+        </div>
+        <div class="chatcontrolbtns">
+            <div class="chatbtn">
+                <i class="far fa-bell"></i>
+            </div>
+            {% if room.type == 'group' %}
+            <div class="chatbtn" id="openmemberinvitebox">
+                <i class="far fa-user-plus"></i>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="form-control" id="chatLog" readonly>
@@ -25,7 +34,7 @@
         <div class="chat {% if user.username == msg.user.username %} mychat {% endif %}">
             <div class="msgdata">
                 <span>{{msg.user.username}}</span>
-                {{msg.content}}
+                <p>{{msg.content|filterMsg|safe}}</p>
             </div>
             <div class="othermsgdata">
                 <div>{{msg.timestamp|date:'d:i j M, y' }}</div>
@@ -37,13 +46,152 @@
         <i class="fas fa-paperclip"></i>
         <input type="text" class="form-control" id="chatMessageInput" placeholder="Write your message...">
         <button id="chatMessageSend" type="button"><i class="fas fa-paper-plane-top"></i></button>
+        <div class="tagsugg"></div>
     </div>
 </div>
+
+<div class="inviteuserbox-overlay">
+    <div class="inviteuserbox">
+        <h3>Invite Members</h3>
+        <div class="usersearchbar">
+            <i class="fa-light fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search peoples ..." id="userInviteSearchbar">
+        </div>
+        <div class="invitemsg"></div>
+        <div class="userusersugg"></div>
+    </div>
+
+</div>
+
+
+
+
+
 {{ room.name|json_script:"roomName" }}
 {{ room.type|json_script:"roomType" }}
 {{ user.username|json_script:"userName" }}
+{{membersList|json_script:"membersList"}}
+
 </div>
 <script src="/static/js/room.js"></script>
+<script>
+    const membersList = JSON.parse(document.getElementById('membersList').textContent);
+
+    if (roomType == "group") {
+        document.getElementById("openmemberinvitebox").addEventListener("click", (e) => {
+            document.querySelector(".inviteuserbox-overlay").classList.add("inviteuserbox-open");
+            populateInvitedUserFromContact();
+
+        })
+    }
+
+
+    document.querySelector(".inviteuserbox-overlay").addEventListener('click', function (event) {
+        if (document.querySelector(".inviteuserbox-overlay") !== event.target) return;
+        document.querySelector(".inviteuserbox-overlay").classList.remove("inviteuserbox-open");
+    }, false);
+
+
+    document.getElementById("userInviteSearchbar").addEventListener("input", (e) => {
+        if (e.target.value != "") {
+            populateInvitedUserFromContact(e.target.value)
+        } else {
+            populateInvitedUserFromContact();
+        }
+    })
+
+
+    document.getElementById("chatMessageInput").addEventListener("input", (e) => {
+        let text = e.target.value;
+        let splited = text.split(" ");
+        let lastElement = splited.pop();
+        let tagsuggbox = document.querySelector(".chatMessageInputBox .tagsugg")
+        tagsuggbox.innerHTML = "";
+
+        if (lastElement.search("@") == 0) {
+            lastElement = lastElement.slice(1);
+            console.log(lastElement);
+            if (lastElement == "") {
+                membersList.forEach(member => {
+                    tagsuggbox.innerHTML += `<div class="sugg" onclick="settag('${member}')">@${member}</div>`
+                });
+            }
+            else {
+                membersList.forEach(member => {
+                    if (member.search(lastElement) == 0) {
+                        tagsuggbox.innerHTML += `<div class="sugg" onclick="settag('${member}')">@${member}</div>`
+                    }
+                });
+            }
+        }
+    })
+
+    function settag(tag) {
+        let text = document.getElementById("chatMessageInput").value;
+        var lastIndex = text.lastIndexOf(" ");
+        text = text.substring(0, lastIndex);
+        text += ` @${tag} `
+        document.getElementById("chatMessageInput").value = text;
+        document.querySelector(".chatMessageInputBox .tagsugg").innerHTML = "";
+        document.getElementById("chatMessageInput").focus();
+
+    }
+
+
+
+    function populateInvitedUserFromContact(searchQuery = "") {
+        let invitesearchresultslist = document.querySelector(".userusersugg");
+        invitesearchresultslist.innerHTML = "";
+        roomsList.forEach(room => {
+            if (room.type == "private") {
+                let roomnamesplited = room.name.split("__");
+                let index = roomnamesplited.indexOf(curUserName);
+                roomnamesplited.splice(index, 1);
+                if (searchQuery != "" && roomnamesplited[0].search(searchQuery) == -1) {
+                    return;
+                }
+                invitesearchresultslist.innerHTML += `
+                <div class="searchresultcard" data-room="${roomnamesplited[0]}" onclick="inviteUser('${roomnamesplited[0]}')">
+                        <div class="searchresultimage">
+                            <div>${roomnamesplited[0][0]}</div>
+                        </div>
+                        <div class="searchresultinfo">
+                            <p class="searchresultinfoname">${roomnamesplited[0]}</p>
+                        </div>
+                    </div>
+                `
+            }
+        });
+
+    }
+
+
+    async function inviteUser(invitedUser) {
+        const rawInviteResponse = await fetch('/chat/inviteuser', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRF_TOKEN
+            },
+            mode: 'same-origin',
+            body: JSON.stringify({
+                room_name: roomName,
+                user_name: invitedUser
+            })
+        });
+
+        const inviteResponse = await rawInviteResponse.json();
+        console.log(inviteResponse);
+        if (inviteResponse.error) {
+            document.querySelector(".invitemsg").innerHTML = inviteResponse.msg;
+        }
+        else {
+            document.querySelector(".invitemsg").innerHTML = inviteResponse.msg;
+            internalMsgSender(`Invited @${invitedUser} in this group.`);
+        }
+    }
+</script>
 
 
 {% endblock %}

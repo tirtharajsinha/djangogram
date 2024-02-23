@@ -328,7 +328,7 @@
   border-radius: 5px;
 }
 
-.searchresultlist .searchresultcard {
+.searchresultcard {
   width: 100%;
   display: flex;
   align-items: center;
@@ -339,11 +339,11 @@
   cursor: pointer;
 }
 
-.searchresultlist .searchresultcard:hover {
+.searchresultcard:hover {
   background-color: var(--bg-primary);
 }
 
-.searchresultlist .searchresultcard .searchresultimage {
+.searchresultcard .searchresultimage {
   flex-basis: 30px;
   width: 30px;
   height: 30px;
@@ -353,27 +353,27 @@
   border-radius: 50%;
   background-color: var(--yellow-color);
 }
-.searchresultlist .searchresultcard .searchresultimage div {
+.searchresultcard .searchresultimage div {
   font-size: 22px;
   font-weight: 900;
   color: #2e3440;
   text-transform: capitalize;
 }
 
-.searchresultlist .searchresultcard .searchresultinfo {
+.searchresultcard .searchresultinfo {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.searchresultlist .searchresultcard .searchresultinfoname {
+.searchresultcard .searchresultinfoname {
   font-size: 18px;
   font-weight: 500;
   color: var(--accent-color);
 }
 
-.searchresultlist .searchresultcard .searchresultinfolastmsg {
+.searchresultcard .searchresultinfolastmsg {
   font-size: 12px;
   font-weight: 500;
   color: var(--color-secondary);

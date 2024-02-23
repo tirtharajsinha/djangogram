@@ -1,10 +1,10 @@
 import json
-from django.forms import ValidationError, model_to_dict
+from django.forms import IntegerField, ValidationError, model_to_dict
 from django.shortcuts import render, redirect
-from chat.models import Room, Message, JoinedRoom
+from chat.models import Room, Message, JoinedRoom, LetestMessage
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
-from django.db.models import Q
+from django.db.models import Q, F, When, Case
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -18,7 +18,7 @@ def chat_index(request):
         Q(id__in=joined_rooms) | Q(firstUser=user) | Q(secondUser=user) | Q(admin=user)
     ).order_by("-id")
 
-    # print(list(joined_rooms), list(rooms), flush=True)
+    # print(list(r), list(rooms), flush=True)
     return render(
         request,
         "index.html",
@@ -82,7 +82,9 @@ def room_view(request, room_uuid):
             return redirect("/chat")
 
     if chat_room.type == "group":
-        joinroom = JoinedRoom.objects.get_or_create(room=chat_room, user=request.user)
+        joinroom, created = JoinedRoom.objects.get_or_create(
+            room=chat_room, user=request.user
+        )
 
     room_messages = Message.objects.filter(room=chat_room)
 
@@ -91,11 +93,24 @@ def room_view(request, room_uuid):
         Q(id__in=joined_rooms) | Q(firstUser=user) | Q(secondUser=user) | Q(admin=user)
     ).order_by("-id")
 
-    print(rooms)
+    members_data = JoinedRoom.objects.filter(room=chat_room)
+
+    members = []
+    for member in members_data:
+        if member.user.username != user.username:
+            members.append(member.user.username)
+
+    # print(list(members), flush=True)
+
     return render(
         request,
         "room.html",
-        {"room": chat_room, "room_messages": room_messages, "rooms": rooms},
+        {
+            "room": chat_room,
+            "room_messages": room_messages,
+            "rooms": rooms,
+            "membersList": list(members),
+        },
     )
 
 
@@ -134,3 +149,34 @@ def get_search_data(request, query):
     ).values("username")
     print(list(users), flush=True)
     return JsonResponse({"rooms": list(rooms), "users": list(users)})
+
+
+@login_required
+def invite_user_to_group(request):
+    if request.method == "POST":
+        try:
+            json_data = json.loads(request.body)
+            room_name = json_data.get("room_name")
+            invited_user_name = json_data.get("user_name")
+
+            invited_user = User.objects.filter(username=invited_user_name).first()
+            chat_room = Room.objects.filter(name=room_name).first()
+
+            joinroom, created = JoinedRoom.objects.get_or_create(
+                room=chat_room, user=invited_user
+            )
+
+            if created:
+                # message = Message.objects.create(
+                #     user=request.user,
+                #     room=chat_room,
+                #     content=f"Invited @{invited_user_name} to join this group.",
+                # )
+                return JsonResponse({"msg": "Invited successfully", "error": False})
+            else:
+                return JsonResponse(
+                    {"msg": f"{invited_user_name} is already a member", "error": True}
+                )
+        except Exception as e:
+            print(str(e), flush=True)
+            return JsonResponse({"msg": f"Something went wrong", "error": True})

@@ -1,6 +1,6 @@
 from django import template
 from django.core.serializers import serialize
-import json
+import json, re
 
 register = template.Library()
 
@@ -25,3 +25,27 @@ def room_to_private(room, user):
 @register.filter
 def querysetToJson(queryset):
     return list(queryset.values())
+
+
+@register.filter
+def filterMsg(value):
+    # Replace url to link
+    urls = re.compile(
+        r"((https?):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)",
+        re.MULTILINE | re.UNICODE,
+    )
+    value = urls.sub(r'<a href="\1" target="_blank">\1</a>', value)
+    # Replace email to mailto
+    urls = re.compile(r"([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)", re.MULTILINE | re.UNICODE)
+    value = urls.sub(r'<a href="mailto:\1" target="_blank">\1</a>', value)
+
+    matches = list(filter(lambda word: word[0] == "@", value.split()))
+    # print(matches)
+    for match in matches:
+        val = match[1:]
+        value = value.replace(
+            match, f"<a href='/chat/privatechat/{val}' class='tagtype'>{match}</a>"
+        )
+
+    # print(value, flush=True)
+    return value
