@@ -49,3 +49,17 @@ def filterMsg(value):
 
     # print(value, flush=True)
     return value
+
+
+@register.filter
+def isAuthtypeChecker(authtype, value):
+    if authtype == value:
+        return "openform"
+    else:
+        return ""
+
+
+@register.filter
+def enableRegisterForm(authtype, subvalue):
+    if authtype == "register":
+        return f"{subvalue}-toggle"

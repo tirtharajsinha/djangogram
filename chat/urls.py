@@ -4,6 +4,9 @@ from . import views
 
 urlpatterns = [
     path("", views.chat_index, name="chat-index"),
+    path("login", views.loginView, name="login"),
+    path("register", views.registerView, name="register"),
+    path("logout", views.logoutView, name="register"),
     path("newroom", views.create_room, name="chat-create-room"),
     path("<str:room_uuid>/", views.room_view, name="chat-room"),
     path(

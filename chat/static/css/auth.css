@@ -1,0 +1,244 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,regular,500,600,700,100italic,200italic,300italic,italic,500italic,600italic,700italic);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+:root {
+  --bg-primary: white;
+  --bg-secodary: rgb(225, 225, 225);
+  --color-primary: rgb(33, 33, 33);
+  --color-secondary: black;
+  --accent-color: rgb(48, 48, 61);
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 0.2px;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.formbox {
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+  transform: translateX(0);
+  background-color: var(--bg-primary);
+  transition: transform 1s ease;
+}
+
+.formbox-toggle {
+  transform: translateX(100%);
+}
+
+.imagebox {
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  transform: translateX(100%);
+  background-color: transparent;
+  transition: transform 1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imagebox-toggle {
+  transform: translateX(0);
+}
+
+.formbox .icon {
+  position: absolute;
+  left: 20px;
+  width: 150px;
+  height: auto;
+}
+
+.formbox .login,
+.formbox .register {
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  flex-direction: column;
+  transition: opacity 1s ease;
+}
+
+.openform {
+  display: flex !important;
+}
+
+.formbox form {
+  width: calc(100% - 20px);
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.formbox h1 {
+  color: var(--color-primary);
+  font-weight: 300;
+  font-family: "Roboto Mono";
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 10px;
+  text-align: right;
+  width: 100%;
+}
+.formbox h1 i {
+  margin-right: 10px;
+  font-size: 25px;
+}
+
+.formbox .formbatch {
+  width: 100%;
+}
+
+.formbox .form-control {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid var(--color-primary);
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 7px 10px;
+}
+
+.formbox .form-control input {
+  outline: none;
+  border: none;
+  padding: 0 10px;
+  flex-grow: 1;
+  color: var(--color-primary);
+  font-size: 18px;
+}
+.formbox .form-control input:focus {
+  outline: none;
+  border: none;
+}
+
+.formbox .form-btn-control {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.formbox .form-btn-control button {
+  outline: none;
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--bg-primary);
+  padding: 12px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+.formbox .form-btn-control p {
+  flex-grow: 1;
+  padding-left: 10px;
+  letter-spacing: 0.2px;
+}
+
+.formbox .newregister {
+  width: 100%;
+  text-decoration: none;
+  color: var(--color-primary);
+  padding: 10px;
+  text-align: right;
+  cursor: pointer;
+}
+
+.formbox .formerrors {
+  width: 100%;
+}
+.formbox .errorlist {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.formbox .formerrors .errorlist {
+  border: 1px solid rgb(228, 88, 88);
+  border-radius: 10px;
+}
+
+.formbox .errorlist li {
+  list-style: none;
+  padding: 7px 10px;
+  font-size: 16px;
+  font-weight: 300;
+  color: rgb(228, 88, 88);
+}
+
+.imagebox .mask1 {
+  width: 80%;
+  -webkit-mask-image: url(/static/image/pentagon.png);
+  mask-image: url(/static/image/pentagon.png);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  user-select: none;
+}
+
+.imagebox .mask1 img {
+  width: 100%;
+  height: auto;
+  transform: scale(1.2);
+  user-select: none;
+}
+
+@media only screen and (max-width: 620px) {
+  .imagebox {
+    display: none;
+  }
+  .imagebox-toggle {
+    display: none;
+  }
+
+  .formbox {
+    width: 100%;
+  }
+  .formbox-toggle {
+    transform: translateX(0);
+  }
+
+  .formbox .icon {
+    width: 100px;
+  }
+}

@@ -7,7 +7,74 @@ from django.http import HttpResponseNotFound
 from django.db.models import Q, F, When, Case
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from .forms import LoginForm, RegisterForm
+from django.contrib.auth import login, authenticate, logout
+
+
+@csrf_protect
+def loginView(request):
+    next = request.GET.get("next") or "/chat"
+    print(next, flush=True)
+    if request.method == "POST":
+        loginform = LoginForm(request.POST)
+        registerform = RegisterForm()
+
+        # check whether it's valid:
+        if loginform.is_valid():
+            username = loginform.cleaned_data["username"]
+            password = loginform.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                # messages.success(request, f"Hi {username.title()}, welcome back!")
+                return redirect(next)
+            else:
+                loginform.add_error(None, "Wrong username or password")
+
+        # print(loginform.cleaned_data, loginform.errors, flush=True)
+
+    else:
+        loginform = LoginForm()
+        registerform = RegisterForm()
+
+    return render(
+        request,
+        "auth.html",
+        {
+            "authtype": "login",
+            "loginform": loginform,
+            "registerform": registerform,
+            "next": next,
+        },
+    )
+
+
+@login_required
+def logoutView(request):
+    logout(request)
+    return redirect("/chat")
+
+
+@csrf_protect
+def registerView(request):
+    if request.method == "POST":
+        registerform = RegisterForm(request.POST)
+        loginform = LoginForm()
+        # check whether it's valid:
+        if registerform.is_valid():
+            # print(registerform.cleaned_data, flush=True)
+            registerform.save()
+
+        return redirect("/chat/login")
+    else:
+        loginform = LoginForm()
+        registerform = RegisterForm()
+    return render(
+        request,
+        "auth.html",
+        {"authtype": "register", "loginform": loginform, "registerform": registerform},
+    )
 
 
 @login_required

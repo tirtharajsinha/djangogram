@@ -1,0 +1,191 @@
+{% load chattags %}
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link rel='stylesheet' href='https://site-assets.fontawesome.com/releases/v6.4.0/css/all.css'>
+    <link rel="stylesheet" href="/static/css/auth.css">
+    <title>
+        {% if authtype == 'login' %}
+        Login | Djangogram
+        {% else %}
+        Register | Djangogram
+        {% endif %}
+    </title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="formbox {{authtype|enableRegisterForm:" formbox"}}">
+            <image class="icon" src="/static/image/icon.png" />
+            <div class="login {{authtype|isAuthtypeChecker:'login'}}">
+                <form action="/chat/login?next={{next}}" method="POST">
+                    <h1><i class="fal fa-stars"></i> <span>Welcome Back</span></h1>
+                    {% csrf_token %}
+                    <div class="formbatch">
+                        <label class="form-control" for="{{ loginform.username.id_for_label }}">
+                            {{loginform.username}}
+                            <i class="fal fa-user"></i>
+                        </label>
+                        {{ loginform.username.errors }}
+                    </div>
+
+                    <div class="formbatch"><label class="form-control" for="{{ loginform.password.id_for_label }}">
+                            {{loginform.password}}
+                            <i class="fal fa-key-skeleton"></i>
+                        </label>
+                        {{ loginform.password.errors }}
+                    </div>
+
+
+                    {% if loginform.non_field_errors %}
+                    <div class="formerrors">
+                        {{loginform.non_field_errors}}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-btn-control">
+                        <p>Opps, forgot password!</p>
+                        <button>Sign in</button>
+                    </div>
+
+                    <a onclick="showRegister()" class="newregister">
+                        Want an account? Register now
+                    </a>
+                </form>
+            </div>
+            <div class="register {{authtype|isAuthtypeChecker:'register'}}">
+                <form action="/chat/register" method="POST">
+                    <h1><i class="fal fa-stars"></i> <span>Welcome</span></h1>
+                    {% csrf_token %}
+                    <div class="formbatch"><label class="form-control" for="{{ registerform.username.id_for_label }}">
+                            {{registerform.username}}
+                            <i class="fal fa-user"></i>
+                        </label>
+                        {{ registerform.username.errors }}
+                    </div>
+
+                    <div class="formbatch"><label class="form-control" for="{{ registerform.first_name.id_for_label }}">
+                            {{registerform.first_name}}
+                            <i class="fal fa-id-card"></i>
+                        </label>
+                        {{ registerform.first_name.errors }}
+                    </div>
+
+                    <div class="formbatch"><label class="form-control" for="{{ registerform.last_name.id_for_label }}">
+                            {{registerform.last_name}}
+                            <i class="fal fa-signature"></i>
+                        </label>
+                        {{ registerform.last_name.errors }}
+                    </div>
+
+                    <div class="formbatch"><label class="form-control" for="{{ registerform.email.id_for_label }}">
+                            {{registerform.email}}
+                            <i class="fal fa-at"></i>
+                        </label>
+                        {{ registerform.email.errors }}
+                    </div>
+
+                    <div class="formbatch"><label class="form-control" for="{{ loginformregisterform.id_for_label }}">
+                            {{registerform.password}}
+                            <i class="fal fa-key-skeleton"></i>
+                        </label>
+                        {{ registerform.password.errors }}
+                    </div>
+
+                    {% if registerform.non_field_errors %}
+                    <div class="formerrors">
+                        {{registerform.non_field_errors}}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-btn-control">
+                        <p>Create a new account</p>
+                        <button>Sign Up</button>
+                    </div>
+
+
+                    <a onclick="showLogin()" class="newregister">
+                        Got an account? Login now
+                    </a>
+                </form>
+            </div>
+        </div>
+        <div class="imagebox {{authtype|enableRegisterForm:" imagebox"}}">
+            <div class="mask1">
+                <img src="/static/image/OIG1.jpeg" alt="">
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    function rev() {
+        document.querySelector(".container .imagebox").classList.toggle("imagebox-toggle");
+        document.querySelector(".container .formbox").classList.toggle("formbox-toggle");
+    }
+
+    function animateShape(direction = "-") {
+        document.querySelector('.imagebox .mask1').animate(
+            [
+                { transform: "rotate(0)" },
+                { transform: `rotate(${direction}90deg)` },
+            ],
+            {
+                duration: 750,
+                iterations: 1,
+                fill: "forwards",
+                easing: "linear",
+            },
+        );
+
+        let oppsitedirection = ""
+
+        if (direction == "") {
+            oppsitedirection = "-"
+        }
+
+
+        document.querySelector('.imagebox .mask1 img').animate(
+            [
+                { transform: "rotate(0)" },
+                { transform: `rotate(${oppsitedirection}90deg)` },
+            ],
+            {
+                duration: 750,
+                iterations: 1,
+                fill: "forwards",
+                easing: "linear",
+            },
+        );
+    }
+
+    function showLogin() {
+        rev();
+        document.title = "Login | Djangogram";
+        animateShape("");
+        setTimeout(() => {
+            document.querySelector(".login").classList.add("openform");
+            document.querySelector(".register").classList.remove("openform");
+        }, 100);
+
+    }
+
+
+    function showRegister() {
+        rev();
+        document.title = "Register | Djangogram";
+        animateShape();
+        setTimeout(() => {
+            document.querySelector(".login").classList.remove("openform");
+            document.querySelector(".register").classList.add("openform");
+        }, 100);
+
+    }
+</script>
+
+</html>
