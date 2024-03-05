@@ -105,7 +105,11 @@ function filterMsg(text) {
 let chatSocket = null;
 
 function connect() {
-    chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/" + roomName + "/");
+    let websocketprotocol = 'ws://'
+    if (window.location.protocol === 'https:') {
+        websocketprotocol = 'wss://'
+    }
+    chatSocket = new WebSocket(websocketprotocol + window.location.host + "/ws/chat/" + roomName + "/");
 
     chatSocket.onopen = function (e) {
         console.log("Successfully connected to the WebSocket.");
