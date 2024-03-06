@@ -15,12 +15,31 @@
         type="text/javascript"></script>
 
     {% block head %}{% endblock %}
-
-
     <title>{% block title %}{% endblock %} Djangogram</title>
+    <script>
+        async function curTheme() {
+            let theme = await localStorage.getItem("curtheme");
+            if (theme === null) {
+                theme = "light";
+                localStorage.setItem("curtheme", "light")
+            }
+            return await theme;
+
+        }
+
+        async function setCurrentTheme() {
+            let curtheme = await curTheme();
+            console.log(curtheme);
+
+            if (curtheme == "dark") {
+                document.querySelector("body").classList.add("darktheme");
+            }
+        }
+    </script>
 </head>
 
 <body>
+    <script>setCurrentTheme();</script>
     <div id="sidebar">
         <div id="split-bar"></div>
         <div class="sidebar">
@@ -147,8 +166,7 @@
 
 
         document.querySelector(".themetoggle").addEventListener("click", (e) => {
-            console.log("changing theme");
-            document.querySelector("body").classList.toggle("darktheme")
+            toggleTheme();
         })
 
         document.querySelector(".menutoggle").addEventListener("click", (e) => {
@@ -167,6 +185,24 @@
         document.querySelector(".close-room-creator").addEventListener("click", (e) => {
             toggle_group_creator();
         })
+
+
+        function toggleTheme() {
+            if (document.querySelector("body").classList.contains("darktheme")) {
+                changeTheme("light");
+            } else {
+                changeTheme("dark");
+            }
+
+            document.querySelector("body").classList.toggle("darktheme");
+
+        }
+
+
+
+        function changeTheme(theme) {
+            localStorage.setItem("curtheme", theme);
+        }
 
         document.getElementById("searchbar").addEventListener("input", (e) => {
             document.querySelector(".localsearchresultlist").innerHTML = "";
