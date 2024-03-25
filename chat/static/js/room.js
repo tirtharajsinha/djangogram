@@ -3,6 +3,7 @@ console.log("Sanity check from room.js.");
 const roomName = JSON.parse(document.getElementById('roomName').textContent);
 const roomType = JSON.parse(document.getElementById('roomType').textContent);
 const userName = JSON.parse(document.getElementById('userName').textContent);
+const roomUuid = JSON.parse(document.getElementById('roomUuid').textContent);
 
 
 let chatLog = document.querySelector("#chatLog");
@@ -109,7 +110,7 @@ function connect() {
     if (window.location.protocol === 'https:') {
         websocketprotocol = 'wss://'
     }
-    chatSocket = new WebSocket(websocketprotocol + window.location.host + "/ws/chat/" + roomName + "/");
+    chatSocket = new WebSocket(websocketprotocol + window.location.host + "/ws/chat/" + roomUuid + "/");
 
     chatSocket.onopen = function (e) {
         console.log("Successfully connected to the WebSocket.");

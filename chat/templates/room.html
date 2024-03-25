@@ -70,6 +70,7 @@
 {{ room.name|json_script:"roomName" }}
 {{ room.type|json_script:"roomType" }}
 {{ user.username|json_script:"userName" }}
+{{ room.unique_id|json_script:"roomUuid" }}
 {{membersList|json_script:"membersList"}}
 
 </div>

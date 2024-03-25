@@ -343,24 +343,27 @@
             if (newgroupname == "") {
                 document.querySelector(".creator-error").innerHTML = "Group name can't be empty."
             }
-            document.querySelector(".create-room-btn i").style.display = "inline";
-            let res = await request_create_group(newgroupname);
-
-            if (res.error) {
-                document.querySelector(".create-room-btn i").style.display = "none";
-                document.querySelector(".creator-error").innerHTML = res.error;
-                console.log(res);
-            }
-            else if (res.success) {
-                document.querySelector(".create-room-btn i").style.display = "none";
-                document.querySelector(".creator-error").innerHTML = "";
-                console.log("room created successfully");
-                toggle_group_creator();
-                openchat(res.newroom_unique_id);
-            }
             else {
-                document.querySelector(".create-room-btn i").style.display = "none";
+                document.querySelector(".create-room-btn i").style.display = "inline";
+                let res = await request_create_group(newgroupname);
+
+                if (res.error) {
+                    document.querySelector(".create-room-btn i").style.display = "none";
+                    document.querySelector(".creator-error").innerHTML = res.error;
+                    console.log(res);
+                }
+                else if (res.success) {
+                    document.querySelector(".create-room-btn i").style.display = "none";
+                    document.querySelector(".creator-error").innerHTML = "";
+                    console.log("room created successfully");
+                    toggle_group_creator();
+                    openchat(res.newroom_unique_id);
+                }
+                else {
+                    document.querySelector(".create-room-btn i").style.display = "none";
+                }
             }
+
         }
 
 
