@@ -60,5 +60,8 @@ services:
         - path: ./core
           target: /app/core
           action: sync
+        - path: ./home
+          target: /app/home
+          action: sync
 
 
