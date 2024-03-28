@@ -2,3 +2,6 @@ Django==4.0
 channels==3.0.4
 channels-redis==3.3.1
 psycopg2-binary
+whitenoise
+daphne
+python-dotenv

@@ -17,11 +17,10 @@ class ChatConsumer(WebsocketConsumer):
         self.user_inbox = None
 
     def connect(self):
-        print("hello world", "#" * 20, flush=True)
         uniqueid = self.scope["url_route"]["kwargs"]["room_uuid"]
         self.room = Room.objects.get(unique_id=uniqueid)
         self.room_name = self.room.name
-        print(self.room_name, flush=True)
+        # print(self.room_name, flush=True)
         self.room_group_name = f"chat_{uniqueid}"
         self.user = self.scope["user"]
         self.user_inbox = f"inbox_{self.user.username}"
